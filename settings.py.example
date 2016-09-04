@@ -1,0 +1,9 @@
+oauth = ('key', 'secret')
+access_token = ('key', 'secret')
+
+users = [
+    'Minecraft',
+    'Dinnerbone',
+    'jeb_',
+    'notch',
+]
