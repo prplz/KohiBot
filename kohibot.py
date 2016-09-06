@@ -36,10 +36,10 @@ def main():
     message = None
     for i in range(args.count):
         message = ramble(chain)
-        print message
+        print repr(message)
 
     if args.tweet and message is not None:
-        print 'Tweeeting: ' + message
+        print 'Tweeeting: ' + repr(message)
         api.update_status(message)
 
 
