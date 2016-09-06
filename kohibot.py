@@ -51,8 +51,11 @@ def chain_words(chain, words):
     # filter links
     words = filter(lambda w: not (w.startswith('http://') or w.startswith('https://')), words)
 
-    # filter mentions
-    words = map(lambda w: w.strip('.,"\'@()[]!?'), words)
+    # avoid mentions
+    words = map(lambda w: w.replace('@', ''), words)
+
+    # strip symbols
+    words = map(lambda w: w.strip('`~!#$%^&*()-_=+[{]};:\'",<.>/?\\|'), words)
 
     # map start word
     chain[None].append(words[0])
