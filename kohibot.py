@@ -1,6 +1,7 @@
 import random
 from argparse import ArgumentParser
 from collections import defaultdict
+from HTMLParser import HTMLParser
 
 import tweepy
 
@@ -17,6 +18,8 @@ def main():
     auth.set_access_token(*settings.access_token)
     api = tweepy.API(auth)
 
+    html_parser = HTMLParser()
+
     chain = defaultdict(list)
     tweet_count = 0
 
@@ -24,7 +27,8 @@ def main():
         print 'Getting tweets for %s...' % user
         try:
             for tweet in api.user_timeline(id=user, count=100, exclude_replies=True, include_rts=False):
-                words = tweet.text.split()
+                text = html_parser.unescape(tweet.text)
+                words = text.split()
                 if chain_words(chain, words):
                     tweet_count += 1
         except tweepy.error.TweepError as e:
