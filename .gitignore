@@ -1,5 +1,6 @@
 .idea
 env
 *.pyc
-settings.py
 deploy.sh
+settings.py
+*.db
