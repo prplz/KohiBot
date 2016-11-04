@@ -8,6 +8,7 @@ from peewee import IntegrityError
 
 from brain import Brain
 from db import Tweet
+from logger import logger
 from util import sanitize_words
 
 
@@ -60,10 +61,10 @@ class TwitterBot:
                         except IntegrityError:
                             pass
                     if tweets_saved > 0:
-                        print '[check_tweets] Got %d new tweets from %s' % (tweets_saved, user)
+                        logger.info('[check_tweets] Got %d new tweets from %s', tweets_saved, user)
                         self.reload_brain()
                 except Exception as exc:
-                    print '[check_tweets] Error while getting tweets of %s: %s' % (user, exc)
+                    logger.info('[check_tweets] Error while getting tweets of %s: %s', user, exc)
                 gevent.sleep(10)
 
     def tweet_scheduler(self):
@@ -77,7 +78,7 @@ class TwitterBot:
 
     def on_reply(self, status):
         if status.in_reply_to_user_id == self.me.id:
-            print '[on_reply] %s' % status.text
+            logger.info('[on_reply] %s', status.text)
             msg = re.sub(r'@\w+ ?', '', status.text)
             words = sanitize_words(msg.split())
             at = '@' + status.user.screen_name + ' '
@@ -87,7 +88,7 @@ class TwitterBot:
 
     def update_status(self, **kwargs):
         if self.args.test:
-            print '[update_status] %s (Not tweeted due to --test)' % kwargs['status']
+            logger.info('[update_status] %s (Not tweeted due to --test)', kwargs['status'])
         else:
-            print '[update_status] %s' % kwargs['status']
+            logger.info('[update_status] %s', kwargs['status'])
             self.api.update_status(**kwargs)

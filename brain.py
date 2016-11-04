@@ -4,6 +4,7 @@ from collections import defaultdict
 
 import util
 from db import Tweet
+from logger import logger
 
 html_parser = HTMLParser()
 
@@ -20,9 +21,8 @@ class Brain:
         for tweet in tweets:
             if brain.add_tweet(tweet.text):
                 tweets_used += 1
-        print '[load_from_db] limit=%d loaded=%d used=%d chain=%d' % (
-            limit, len(tweets), tweets_used, len(brain.chain)
-        )
+        logger.info('[load_from_db] limit=%d loaded=%d used=%d chain=%d',
+                    limit, len(tweets), tweets_used, len(brain.chain))
         return brain
 
     def add_tweet(self, text):
