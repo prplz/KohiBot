@@ -38,7 +38,7 @@ class TwitterBot:
             listener = tweepy.StreamListener()
             listener.on_status = self.on_reply
             stream = tweepy.Stream(auth=self.auth, listener=listener)
-            gevent.spawn(stream.userstream)
+            gevent.spawn(self.check_replies, stream)
 
         # Keep main alive
         while True:
@@ -61,10 +61,13 @@ class TwitterBot:
                         except IntegrityError:
                             pass
                     if tweets_saved > 0:
-                        logger.info('[check_tweets] Got %d new tweets from %s', tweets_saved, user)
+                        logger.debug('[check_tweets] Got %d new tweets from %s', tweets_saved, user)
                         self.reload_brain()
+                except tweepy.TweepError as exc:
+                    logger.warn('[check_tweets] Error while getting tweets of %s: %s', user, exc)
                 except Exception as exc:
-                    logger.info('[check_tweets] Error while getting tweets of %s: %s', user, exc)
+                    logger.error('[check_tweets] Error while getting tweets of %s:', user)
+                    logger.exception(exc)
                 gevent.sleep(10)
 
     def tweet_scheduler(self):
@@ -74,6 +77,15 @@ class TwitterBot:
             if int(time()) / seconds != t / seconds:
                 self.update_status(status=self.brain.ramble())
             t = int(time())
+            gevent.sleep(1)
+
+    def check_replies(self, stream):
+        while True:
+            try:
+                stream.userstream()
+            except Exception as exc:
+                logger.error('[check_replies] Error checking replies:')
+                logger.exception(exc)
             gevent.sleep(1)
 
     def on_reply(self, status):
@@ -91,4 +103,8 @@ class TwitterBot:
             logger.info('[update_status] %s (Not tweeted due to --test)', kwargs['status'])
         else:
             logger.info('[update_status] %s', kwargs['status'])
-            self.api.update_status(**kwargs)
+            try:
+                self.api.update_status(**kwargs)
+            except Exception as exc:
+                logger.error('[update_status] Error updating status:')
+                logger.exception(exc)
