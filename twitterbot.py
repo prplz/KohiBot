@@ -1,5 +1,6 @@
 import random
 import re
+from datetime import timedelta
 from time import time
 
 import gevent
@@ -8,6 +9,7 @@ from peewee import IntegrityError
 
 from brain import Brain
 from db import Tweet
+from limiter import Limiter
 from logger import logger
 from util import sanitize_words
 
@@ -21,6 +23,9 @@ class TwitterBot:
         self.auth.set_access_token(*self.settings.access_token)
         self.api = tweepy.API(self.auth)
         self.me = self.api.me()
+
+        self.user_reply_limiter = Limiter(timedelta(minutes=5), 5)
+        self.global_reply_limiter = Limiter(timedelta(minutes=15), 25)
 
         self.brain = None
         self.reload_brain()
@@ -90,13 +95,18 @@ class TwitterBot:
 
     def on_reply(self, status):
         if status.in_reply_to_user_id == self.me.id:
-            logger.info('[on_reply] %s', status.text)
-            msg = re.sub(r'@\w+ ?', '', status.text)
-            words = sanitize_words(msg.split())
-            at = '@' + status.user.screen_name + ' '
-            seed_word = random.choice(words) if words else None
-            reply = at + self.brain.ramble(max_len=140 - len(at), seed_word=seed_word)
-            self.update_status(status=reply, in_reply_to_status_id=status.id)
+            logger.info('[on_reply] <%s> %s', status.user.screen_name, status.text)
+            if not self.global_reply_limiter.use():
+                logger.warn('[on_reply] Replies are being rate limited')
+            elif not self.user_reply_limiter.use(key=status.user.id):
+                logger.warn('[on_reply] Replies to %s are being rate limited', status.user.screen_name)
+            else:
+                msg = re.sub(r'@\w+ ?', '', status.text)
+                words = sanitize_words(msg.split())
+                at = '@' + status.user.screen_name + ' '
+                seed_word = random.choice(words) if words else None
+                reply = at + self.brain.ramble(max_len=140 - len(at), seed_word=seed_word)
+                self.update_status(status=reply, in_reply_to_status_id=status.id)
 
     def update_status(self, **kwargs):
         if self.args.test:
