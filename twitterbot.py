@@ -96,10 +96,10 @@ class TwitterBot:
     def on_reply(self, status):
         if status.in_reply_to_user_id == self.me.id:
             logger.info('[on_reply] <%s> %s', status.user.screen_name, status.text)
-            if not self.global_reply_limiter.use():
-                logger.warn('[on_reply] Replies are being rate limited')
-            elif not self.user_reply_limiter.use(key=status.user.id):
+            if not self.user_reply_limiter.use(key=status.user.id):
                 logger.warn('[on_reply] Replies to %s are being rate limited', status.user.screen_name)
+            elif not self.global_reply_limiter.use():
+                logger.warn('[on_reply] Replies are being rate limited')
             else:
                 msg = re.sub(r'@\w+ ?', '', status.text)
                 words = sanitize_words(msg.split())
