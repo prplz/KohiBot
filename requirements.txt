@@ -1,1 +1,3 @@
-tweepy
+peewee
+gevent
+git+git://github.com/prplz/tweepy.git

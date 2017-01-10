@@ -1,6 +1,18 @@
 oauth = ('key', 'secret')
 access_token = ('key', 'secret')
 
+# How many tweets the bot's brain should use
+brain_select_limit = 2000
+
+# Enable tweeting
+tweet_schedule = True
+
+# Tweet schedule time in minutes
+tweet_schedule_minutes = 30
+
+# Enable replying to users
+replies = True
+
 users = [
     'Minecraft',
     'Dinnerbone',
