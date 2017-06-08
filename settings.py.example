@@ -19,3 +19,9 @@ users = [
     'jeb_',
     'notch',
 ]
+
+blacklist_words = [
+    'heck',
+    'stupid',
+    'dumbo',
+]

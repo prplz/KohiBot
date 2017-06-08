@@ -2,6 +2,7 @@ import random
 from HTMLParser import HTMLParser
 from collections import defaultdict
 
+import settings
 import util
 from db import Tweet
 from logger import logger
@@ -32,6 +33,13 @@ class Brain:
         # require 5+ word sentences
         if len(words) < 5:
             return False
+
+        for word in words:
+            word = word.lower()
+            for bad_word in settings.blacklist_words:
+                if bad_word in word:
+                    return False
+
 
         # map start word
         self.chain[None].append(words[0])
