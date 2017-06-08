@@ -1,4 +1,4 @@
-from peewee import SqliteDatabase, Model, BigIntegerField, CharField
+from peewee import BigIntegerField, CharField, Model, SqliteDatabase
 
 db = SqliteDatabase('kohibot.db')
 

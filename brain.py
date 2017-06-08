@@ -40,7 +40,6 @@ class Brain:
                 if bad_word in word:
                     return False
 
-
         # map start word
         self.chain[None].append(words[0])
 
