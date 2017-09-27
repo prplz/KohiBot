@@ -1,6 +1,9 @@
 oauth = ('key', 'secret')
 access_token = ('key', 'secret')
 
+# Maximum tweet length
+tweet_length = 140
+
 # How many tweets the bot's brain should use
 brain_select_limit = 2000
 

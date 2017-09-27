@@ -80,7 +80,7 @@ class TwitterBot:
         seconds = self.settings.tweet_schedule_minutes * 60
         while True:
             if int(time()) / seconds != t / seconds:
-                self.update_status(status=self.brain.ramble())
+                self.update_status(status=self.brain.ramble(self.settings.tweet_length))
             t = int(time())
             gevent.sleep(1)
 
@@ -105,7 +105,7 @@ class TwitterBot:
                 words = sanitize_words(msg.split())
                 at = '@' + status.user.screen_name + ' '
                 seed_word = random.choice(words) if words else None
-                reply = at + self.brain.ramble(max_len=140 - len(at), seed_word=seed_word)
+                reply = at + self.brain.ramble(max_len=self.settings.tweet_length - len(at), seed_word=seed_word)
                 self.update_status(status=reply, in_reply_to_status_id=status.id)
 
     def update_status(self, **kwargs):

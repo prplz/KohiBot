@@ -52,7 +52,7 @@ class Brain:
 
         return True
 
-    def ramble(self, max_len=140, seed_word=None):
+    def ramble(self, max_len, seed_word=None):
         # starting word
         if seed_word and seed_word.lower() in self.chain:
             word = seed_word
