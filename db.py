@@ -1,11 +1,11 @@
-from peewee import BigIntegerField, CharField, Model, SqliteDatabase
+from peewee import BigIntegerField, CharField, Model, SqliteDatabase, TextField
 
 db = SqliteDatabase('kohibot.db')
 
 
 class Tweet(Model):
     tweet_id = BigIntegerField(primary_key=True)
-    text = CharField(max_length=250, null=False)
+    text = TextField(null=False)
     user_id = BigIntegerField(null=False)
     user_name = CharField(max_length=32, null=False)
 
